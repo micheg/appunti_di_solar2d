@@ -1444,7 +1444,7 @@ Questi sono solo alcuni esempi di come puoi utilizzare gli oggetti di visualizza
 
 Approfondiamo il tutto con un esempio più corposo, un semplice tutorial su come muovere un rettangolo in Solar2D:
 
-*Passo 1: Creazione del rettangolo*
+**Passo 1: Creazione del rettangolo**
 Inizia creando un nuovo progetto Solar2D o utilizzando un progetto esistente. Quindi, crea un rettangolo utilizzando la funzione `display.newRect()` e assegna il rettangolo a una variabile:
 
 ```lua
@@ -1454,7 +1454,7 @@ rect:setFillColor(1, 0, 0) -- Imposta il colore di riempimento a rosso
 
 In questo esempio, stiamo creando un rettangolo rosso di dimensioni 50x50 alle coordinate (100, 100).
 
-*Passo 2: Aggiunta di eventi touch al rettangolo*
+**Passo 2: Aggiunta di eventi touch al rettangolo**
 Per consentire il movimento del rettangolo, aggiungi un evento touch al rettangolo utilizzando la funzione `addEventListener()`. All'interno della funzione di callback per l'evento touch, puoi modificare le coordinate del rettangolo in base al tocco dell'utente:
 
 ```lua
@@ -1483,7 +1483,7 @@ rect:addEventListener("touch", onTouch)
 
 In questo esempio, stiamo gestendo l'evento touch sul rettangolo. Quando l'utente tocca il rettangolo (`began`), memorizziamo le coordinate iniziali del rettangolo. Durante lo spostamento del dito (`moved`), calcoliamo la differenza tra le coordinate iniziali e correnti del tocco e aggiorniamo le coordinate del rettangolo di conseguenza. Quando l'utente rilascia il dito (`ended` o `cancelled`), rimuoviamo il focus dal rettangolo.
 
-*Passo 3: Esecuzione del progetto*
+**Passo 3: Esecuzione del progetto**
 Puoi eseguire il progetto e vedere il rettangolo che può essere spostato toccando e trascinando. Il rettangolo seguirà il movimento del dito dell'utente.
 
 Ricorda che questo è solo un esempio di base per muovere un rettangolo ma dovresti già iniziare ad intuire le possibilità del framework.
@@ -1492,7 +1492,7 @@ Ricorda che questo è solo un esempio di base per muovere un rettangolo ma dovre
 
 Per implementare il movimento e l'animazione in Solar2D, puoi utilizzare diverse approcci. Ecco due metodi comuni:
 
-*1. Movimento tramite transizioni:*
+**1. Movimento tramite transizioni:**
 Puoi utilizzare le transizioni di Solar2D per creare facilmente movimenti fluidi ed effetti di animazione. Le transizioni consentono di specificare la durata dell'animazione, le proprietà da modificare e il tipo di transizione desiderato (come "linear", "easeInOut", ecc.).
 
 Ecco un esempio di come puoi utilizzare una transizione per spostare un rettangolo da una posizione all'altra:
@@ -1508,7 +1508,7 @@ In questo esempio, il rettangolo verrà spostato dalle coordinate (100, 100) all
 
 Puoi anche combinare più proprietà di transizione per creare effetti più complessi come la rotazione, la scala e l'opacità.
 
-*2. Movimento manuale con l'aggiornamento del frame:*
+**2. Movimento manuale con l'aggiornamento del frame:**
 Se desideri avere un controllo più diretto sul movimento degli oggetti e vuoi aggiornare la posizione a ogni frame, puoi farlo utilizzando la funzione `enterFrame` e l'evento `Runtime`.
 
 Ecco un esempio di come puoi muovere un rettangolo utilizzando questa approccio:
@@ -1533,7 +1533,7 @@ Ricorda che puoi combinare questi due metodi o utilizzare altre tecniche avanzat
 
 Vediamo qualcosa di più sule transizioni in Solar2D:
 
-*Passo 1: Creazione dell'oggetto di visualizzazione*
+**Passo 1: Creazione dell'oggetto di visualizzazione**
 Inizia creando un oggetto di visualizzazione, ad esempio un rettangolo, che desideri animare utilizzando una transizione:
 
 ```lua
@@ -1543,7 +1543,7 @@ rect:setFillColor(1, 0, 0)
 
 In questo esempio, stiamo creando un rettangolo rosso di dimensioni 100x100 alle coordinate (100, 100).
 
-*Passo 2: Creazione della transizione*
+**Passo 2: Creazione della transizione**
 Utilizza la funzione `transition.to()` per creare una transizione. Questa funzione richiede due argomenti: l'oggetto di visualizzazione che desideri animare e una tabella di parametri che definisce il comportamento della transizione. Ad esempio, puoi utilizzare una transizione per spostare il rettangolo a nuove coordinate:
 
 ```lua
@@ -1560,7 +1560,7 @@ transition.to(rect, {time = 1000, x = 200, y = 200, rotation = 360})
 
 In questo caso, il rettangolo si sposterà alle coordinate (200, 200) ruotando di 360 gradi nel corso di un secondo.
 
-*Passo 3: Gestione degli eventi di completamento*
+**Passo 3: Gestione degli eventi di completamento**
 Se desideri eseguire un'azione quando la transizione è completata, puoi aggiungere un'opzione `onComplete` nella tabella di parametri. Questa opzione accetta una funzione che verrà chiamata quando la transizione è terminata:
 
 ```lua
@@ -1573,7 +1573,7 @@ transition.to(rect, {time = 1000, x = 200, y = 200, onComplete = onComplete})
 
 In questo esempio, la funzione `onComplete` viene chiamata quando la transizione è completata e stampa un messaggio nella console.
 
-*Passo 4: Esecuzione del progetto*
+**Passo 4: Esecuzione del progetto**
 Puoi eseguire il progetto e osservare l'animazione del rettangolo. Vedrai che il rettangolo si sposterà gradualmente alle nuove coordinate specificate nella transizione.
 
 Ricorda che Solar2D supporta diverse opzioni di transizione come "linear", "easeIn", "easeOut", "easeInOut" e molte altre. Puoi specificare il tipo di transizione utilizzando l'opzione `transition` nella tabella di parametri della transizione. Ad esempio:

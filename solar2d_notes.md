@@ -159,7 +159,7 @@ Lua è ampiamente utilizzato in diversi settori, tra cui sviluppo di giochi, scr
 
 ### Fondamenti di programmazione in Lua
 
-#### Sintassi di base.
+#### Sintassi di base
 
 Ecco una panoramica della sintassi di base di Lua:
 

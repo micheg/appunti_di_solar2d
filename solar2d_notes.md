@@ -55,16 +55,20 @@
    - Gestione degli eventi
    - Utilizzo degli oggetti di visualizzazione (display objects)
    - Movimento e animazione
+   - Un semplice algoritmo di collisione
+   - Il composer
 
 4. Gestione degli input
    - Input utente tramite touch e tap
    - Gestione degli eventi di tocco
    - Utilizzo dei pulsanti virtuali
+   - Un primo esempio di gioco.
 
 5. Grafica e animazione
    - Utilizzo delle immagini e delle sprite sheet
    - Creazione di animazioni con Solar2D
    - Effetti grafici e filtri
+   - Effetti grafici in pratica
 
 6. Audio
    - Riproduzione di suoni e musica
@@ -549,6 +553,33 @@ In Lua, le liste e gli array possono essere implementati utilizzando le tabelle.
 Le tabelle in Lua offrono molta flessibilità per implementare liste e array con funzionalità aggiuntive come indici non numerici, elementi misti e altro ancora. Puoi combinare tabelle, array e altre strutture dati per adattarsi alle tue esigenze specifiche.
 
 Ricorda che in Lua gli indici degli array iniziano da 1 (non da 0 come in alcuni altri linguaggi di programmazione).
+
+#### librerie esterne
+
+In Lua, puoi utilizzare librerie esterne per estendere le funzionalità del linguaggio e accedere a funzioni o risorse aggiuntive. L'utilizzo di librerie esterne richiede generalmente i seguenti passaggi:
+
+1. Installazione della libreria: Prima di poter utilizzare una libreria esterna, è necessario installarla nel tuo ambiente di sviluppo. Questo può comportare il download dei file della libreria e il posizionamento nella directory corretta del tuo progetto.
+
+2. Richiamo della libreria: Dopo aver installato correttamente la libreria, puoi richiamarla nel tuo codice Lua utilizzando la funzione `require()`. Ad esempio:
+
+   ```lua
+   local myLibrary = require("nome_libreria")
+   ```
+
+   La stringa "nome_libreria" dovrebbe essere sostituita con il nome effettivo della libreria che vuoi utilizzare.
+
+3. Utilizzo delle funzioni o risorse della libreria: Una volta caricata la libreria, puoi utilizzare le sue funzioni o risorse secondo le istruzioni fornite nella documentazione della libreria. Ad esempio:
+
+   ```lua
+   local risultato = myLibrary.funzione(parametro)
+   ```
+
+   `myLibrary.funzione` rappresenta una funzione specifica della libreria che stai utilizzando, e `parametro` è un valore che potrebbe essere richiesto dalla funzione.
+
+È importante notare che le specifiche per l'utilizzo delle librerie esterne possono variare a seconda della libreria stessa. Assicurati di leggere attentamente la documentazione della libreria che stai utilizzando per comprendere i dettagli e le istruzioni specifiche per l'installazione e l'utilizzo.
+
+Inoltre, alcune librerie esterne potrebbero richiedere la compilazione o la configurazione aggiuntiva per essere utilizzate correttamente. In questi casi, segui attentamente le istruzioni fornite dalla libreria stessa.
+
 
 ### Stringhe, dati aggregati e iterazione
 
@@ -1585,3 +1616,808 @@ transition.to(rect, {time = 1000, x = 200, y = 200, transition = easing.outQuad}
 In questo caso, stiamo utilizzando l'opzione `transition` con il valore `easing.outQuad` per creare una transizione con una curva di accelerazione personalizzata.
 
 Questo è solo un esempio di base su come utilizzare le transizioni in Solar2D. Puoi sperimentare ulteriormente con le opzioni e le proprietà delle transizioni per creare effetti di animazione più complessi. Assicurati di consultare la documentazione ufficiale di Solar2D per ulteriori dettagli sulle transizioni e le opzioni disponibili.
+
+#### Un semplice algoritmo di collisione 2D
+
+Proviamo a spiegare la collisione tra due rettangoli utilizzando concetti matematici di base.
+
+Più avanti utilizzeremo il motore fisico di Solar2D per gestie le collisioni ma è utile conoscere anche altri sistemi.
+
+La collisione tra due rettangoli può essere determinata confrontando le loro posizioni e dimensioni. Supponiamo di avere due rettangoli A e B con le seguenti proprietà:
+
+Rettangolo A:
+- Posizione: (x1, y1)
+- Dimensioni: larghezzaA, altezzaA
+
+Rettangolo B:
+- Posizione: (x2, y2)
+- Dimensioni: larghezzaB, altezzaB
+
+Per determinare se i due rettangoli si sovrappongono o collidono, possiamo utilizzare l'approccio di rilevamento della collisione basato sugli assi allineati (AABB collision detection).
+
+L'idea principale è controllare se le proiezioni dei rettangoli sugli assi x e y si sovrappongono.
+
+1. Proiezione sugli assi x:
+Per determinare se le proiezioni dei rettangoli A e B sull'asse x si sovrappongono, confrontiamo la posizione delle loro estremità sinistre (minX) e delle loro estremità destre (maxX). Se maxX di A è maggiore o uguale a minX di B e maxX di B è maggiore o uguale a minX di A, allora c'è sovrapposizione sull'asse x.
+
+Condizione per la sovrapposizione sull'asse x: maxXA >= minXB e maxXB >= minXA
+
+2. Proiezione sugli assi y:
+Per determinare se le proiezioni dei rettangoli A e B sull'asse y si sovrappongono, confrontiamo la posizione delle loro estremità superiori (minY) e delle loro estremità inferiori (maxY). Se maxY di A è maggiore o uguale a minY di B e maxY di B è maggiore o uguale a minY di A, allora c'è sovrapposizione sull'asse y.
+
+Condizione per la sovrapposizione sull'asse y: maxYA >= minYB e maxYB >= minYA
+
+Se entrambe le condizioni sopra sono vere, i rettangoli A e B si sovrappongono o collidono.
+
+In termini di pseudocodice, puoi utilizzare queste condizioni per controllare la collisione tra i rettangoli in un linguaggio di programmazione:
+
+```lua
+function checkCollision(rectA, rectB)
+    if rectA.maxX >= rectB.minX and rectB.maxX >= rectA.minX and
+       rectA.maxY >= rectB.minY and rectB.maxY >= rectA.minY then
+        -- Collisione tra i rettangoli
+        return true
+    else
+        -- Nessuna collisione
+        return false
+    end
+end
+```
+
+In questo pseudocodice, `rectA` e `rectB` rappresentano gli oggetti dei rettangoli con le rispettive proprietà (posizione e dimensioni).
+
+#### lo strumento Composer
+
+Le scene in Solar2D sono un meccanismo per organizzare e gestire il contenuto del tuo gioco o dell'applicazione in modo modulare. Una scena rappresenta una sezione o uno stato specifico del tuo progetto, come un livello di gioco, una schermata di menu o una finestra di dialogo.
+
+Le scene consentono di separare il codice e gli elementi visivi correlati in unità indipendenti, semplificando la gestione e la transizione tra le diverse parti del tuo progetto. Ad esempio, puoi avere una scena per il menu principale, una scena per il gioco effettivo e una scena per lo schermo di gioco over. Ogni scena può avere i propri oggetti visivi, eventi, logica di gioco e gestione degli input.
+
+Il Composer di Solar2D è un modulo che facilita la gestione delle scene. Fornisce un insieme di funzioni e metodi per creare, mostrare, nascondere e distruggere le scene. Puoi utilizzare il Composer per passare senza soluzione di continuità da una scena all'altra, gestire la transizione tra le scene e gestire le risorse in modo efficiente.
+
+Le scene offrono numerosi vantaggi, tra cui:
+
+1. Organizzazione del codice: le scene consentono di organizzare il tuo codice in unità modulari, rendendolo più facile da comprendere, modificare e manutenere.
+2. Gestione delle risorse: puoi caricare e scaricare risorse specifiche per ogni scena, ottimizzando l'utilizzo della memoria e migliorando le prestazioni del tuo progetto.
+3. Transizioni fluide: grazie al Composer, puoi applicare effetti di transizione animati quando passi da una scena all'altra, migliorando l'esperienza utente.
+4. Separazione delle responsabilità: le scene consentono di separare le diverse funzionalità del tuo progetto, facilitando la divisione del lavoro tra i membri del team o la gestione delle diverse parti del progetto da soli.
+
+Utilizzando le scene in Solar2D, puoi creare progetti complessi e organizzati in modo efficace, migliorando la manutenibilità, la flessibilità e l'esperienza utente complessiva.
+
+Il Composer è un modulo di Solar2D che consente di gestire facilmente le scene e la navigazione all'interno di un gioco o un'applicazione. Con il Composer, è possibile creare scene separate per schermate, livelli o sezioni del tuo progetto e passare da una scena all'altra in modo fluido.
+
+Ecco i passaggi per utilizzare il Composer in Solar2D:
+
+1. Creazione di una nuova scena:
+   - Iniziamo creando una nuova scena. Crea un nuovo file Lua nella tua cartella del progetto e nominalo ad esempio "scene1.lua".
+   - Nella nuova scena, definisci una tabella che conterrà tutti i metodi e gli eventi della scena. Ad esempio:
+
+     ```lua
+     local scene = {}
+     ```
+
+2. Implementazione dei metodi della scena:
+   - Aggiungi il metodo `create` per inizializzare gli oggetti e gli elementi visivi della scena. Questo metodo viene chiamato una sola volta all'inizio della scena. Ad esempio:
+
+     ```lua
+     function scene:create(event)
+         local sceneGroup = self.view
+         -- Creazione degli oggetti visivi della scena
+     end
+     ```
+
+   - Aggiungi il metodo `show` per gestire l'effettivo inizio della scena. Questo metodo viene chiamato ogni volta che la scena viene visualizzata. Ad esempio:
+
+     ```lua
+     function scene:show(event)
+         local sceneGroup = self.view
+         local phase = event.phase
+
+         if phase == "will" then
+             -- La scena sta per apparire
+         elseif phase == "did" then
+             -- La scena è apparsa
+         end
+     end
+     ```
+
+   - Aggiungi il metodo `hide` per gestire la chiusura o l'uscita dalla scena. Questo metodo viene chiamato quando la scena viene nascosta o sostituita da un'altra scena. Ad esempio:
+
+     ```lua
+     function scene:hide(event)
+         local sceneGroup = self.view
+         local phase = event.phase
+
+         if phase == "will" then
+             -- La scena sta per essere nascosta
+         elseif phase == "did" then
+             -- La scena è stata nascosta
+         end
+     end
+     ```
+
+   - Aggiungi il metodo `destroy` per liberare le risorse utilizzate dalla scena. Questo metodo viene chiamato dopo che la scena è stata rimossa dalla memoria. Ad esempio:
+
+     ```lua
+     function scene:destroy(event)
+         local sceneGroup = self.view
+         -- Pulizia e liberazione delle risorse della scena
+     end
+     ```
+
+3. Aggiunta degli eventi alla scena:
+   - Aggiungi gli eventi necessari per richiamare i metodi corrispondenti durante il ciclo di vita della scena. Ad esempio:
+
+     ```lua
+     scene:addEventListener("create", scene)
+     scene:addEventListener("show", scene)
+     scene:addEventListener("hide", scene)
+     scene:addEventListener("destroy", scene)
+     ```
+
+4. Passaggio da una scena all'altra:
+   - Per passare da una scena all'altra, puoi utilizzare i metodi forniti dal Composer. Ad esempio, per passare dalla `scene1` alla `scene2`, puoi utilizzare il seguente codice all'interno del metodo `show` della `scene1`:
+
+     ```lua
+     local options = {
+         effect = "slideLeft", -- Effetto di transizione tra le scene
+         time = 500 -- Durata dell'effetto di transizione in millisecondi
+     }
+     composer.gotoScene("scene2", options)
+     ```
+
+### Gestione degli input
+
+#### Eventi Touch
+
+In Solar2D, puoi gestire l'input utente tramite touch e tap utilizzando eventi touch e tap. Ecco come funzionano:
+
+1. Eventi touch:
+Gli eventi touch vengono generati quando l'utente tocca lo schermo e muove il dito (o alza il dito) in una determinata area. Puoi gestire gli eventi touch utilizzando la funzione `addEventListener()` e specificando l'evento "touch".
+
+Ecco un esempio di come puoi gestire un evento touch su un oggetto di visualizzazione, ad esempio un rettangolo:
+
+```lua
+local function onTouch(event)
+    if event.phase == "began" then
+        -- L'utente ha toccato l'oggetto
+    elseif event.phase == "moved" then
+        -- L'utente sta muovendo il dito sull'oggetto
+    elseif event.phase == "ended" or event.phase == "cancelled" then
+        -- L'utente ha rilasciato il dito dall'oggetto
+    end
+    return true
+end
+
+rect:addEventListener("touch", onTouch)
+```
+
+Nell'esempio sopra, stiamo gestendo l'evento touch sull'oggetto `rect`. All'interno della funzione di callback `onTouch`, controlliamo la fase dell'evento per determinare lo stato del tocco. La fase "began" indica che l'utente ha iniziato a toccare l'oggetto, la fase "moved" indica che l'utente sta muovendo il dito sull'oggetto e le fasi "ended" o "cancelled" indicano che l'utente ha rilasciato il dito dall'oggetto.
+
+2. Eventi tap:
+Gli eventi tap vengono generati quando l'utente tocca rapidamente uno schermo o un oggetto. Puoi gestire gli eventi tap utilizzando la funzione `addEventListener()` e specificando l'evento "tap".
+
+Ecco un esempio di come puoi gestire un evento tap su un oggetto di visualizzazione:
+
+```lua
+local function onTap(event)
+    -- L'utente ha effettuato un tap sull'oggetto
+    print("Tap!")
+    return true
+end
+
+rect:addEventListener("tap", onTap)
+```
+
+Nell'esempio sopra, stiamo gestendo l'evento tap sull'oggetto `rect`. Quando viene eseguito un tap sull'oggetto, la funzione di callback `onTap` viene chiamata e viene stampato il messaggio "Tap!" nella console.
+
+Ricorda che puoi gestire simultaneamente gli eventi touch e tap su un oggetto di visualizzazione. Puoi anche utilizzare le coordinate `event.x` e `event.y` negli eventi touch e tap per ottenere le coordinate del tocco o del tap sull'oggetto.
+
+Assicurati di leggere la documentazione ufficiale di Solar2D per ulteriori dettagli sugli eventi touch e tap e per scoprire altre opzioni disponibili per la gestione dell'input utente.
+
+La gestione degli eventi di tocco in Solar2D avviene utilizzando la funzione `addEventListener()` e l'evento "touch". Ecco una guida passo-passo su come gestire gli eventi di tocco in Solar2D:
+
+**Passo 1: Creazione dell'oggetto di visualizzazione**
+Inizia creando un oggetto di visualizzazione, come un rettangolo, su cui desideri gestire gli eventi di tocco:
+
+```lua
+local rect = display.newRect(100, 100, 100, 100)
+rect:setFillColor(1, 0, 0)
+```
+
+In questo esempio, stiamo creando un rettangolo rosso di dimensioni 100x100 alle coordinate (100, 100).
+
+**Passo 2: Creazione della funzione di callback per l'evento touch**
+Crea una funzione di callback che verrà chiamata quando si verifica un evento di tocco sull'oggetto di visualizzazione. Questa funzione riceverà un parametro `event` che contiene informazioni sull'evento di tocco, come la fase del tocco e le coordinate del tocco.
+
+```lua
+local function onTouch(event)
+    if event.phase == "began" then
+        -- L'utente ha iniziato a toccare l'oggetto
+    elseif event.phase == "moved" then
+        -- L'utente sta muovendo il dito sull'oggetto
+    elseif event.phase == "ended" or event.phase == "cancelled" then
+        -- L'utente ha rilasciato il dito dall'oggetto
+    end
+    return true
+end
+```
+
+Nell'esempio sopra, stiamo gestendo l'evento touch sull'oggetto `rect`. All'interno della funzione di callback `onTouch`, controlliamo la fase dell'evento utilizzando `event.phase` per determinare lo stato del tocco. Le fasi "began" indicano che l'utente ha iniziato a toccare l'oggetto, la fase "moved" indica che l'utente sta muovendo il dito sull'oggetto e le fasi "ended" o "cancelled" indicano che l'utente ha rilasciato il dito dall'oggetto.
+
+**Passo 3: Aggiunta dell'evento touch all'oggetto di visualizzazione**
+Aggiungi l'evento touch all'oggetto di visualizzazione utilizzando la funzione `addEventListener()`:
+
+```lua
+rect:addEventListener("touch", onTouch)
+```
+
+In questo modo, stiamo assegnando la funzione di callback `onTouch` all'evento "touch" sull'oggetto `rect`.
+
+**Passo 4: Esecuzione del progetto**
+Puoi eseguire il progetto e interagire con l'oggetto di visualizzazione tramite il tocco. Osserva come l'evento touch viene gestito e le azioni all'interno della funzione di callback vengono eseguite in base alla fase del tocco.
+
+Puoi personalizzare ulteriormente la gestione degli eventi di tocco utilizzando le coordinate `event.x` e `event.y` nell'evento touch per ottenere le coordinate del tocco sull'oggetto e utilizzare queste informazioni per implementare il comportamento desiderato.
+
+Ricorda che puoi gestire simultaneamente gli eventi di tocco su più oggetti di visualizzazione e utilizzare le fasi del tocco per determinare quali azioni eseguire in base allo stato del tocco.
+
+Assicurati di consultare la documentazione ufficiale di Solar2D per ulteriori dettagli sugli eventi di tocco e per scoprire altre opzioni disponibili per la gestione degli eventi di tocco.
+
+#### Pulsanti virtuali
+
+Ecco come puoi utilizzare i pulsanti virtuali in Solar2D:
+
+1. Creazione del pulsante
+Inizia creando un oggetto di visualizzazione per rappresentare il tuo pulsante. Puoi utilizzare un'immagine o un rettangolo colorato come base per il pulsante. Ad esempio:
+
+```lua
+local button = display.newRect(100, 100, 200, 80)
+button:setFillColor(0.5, 0.5, 0.5)
+```
+
+In questo esempio, stiamo creando un rettangolo grigio di dimensioni 200x80 alle coordinate (100, 100).
+
+2. Aggiunta della funzione di callback al pulsante
+Successivamente, aggiungi una funzione di callback al pulsante che verrà chiamata quando l'utente tocca o clicca il pulsante. Puoi utilizzare l'evento "tap" per gestire l'input sul pulsante. Ad esempio:
+
+```lua
+local function onButtonTap(event)
+    if event.phase == "ended" then
+        -- Azioni da eseguire quando il pulsante viene toccato o cliccato
+        print("Pulsante premuto!")
+    end
+    return true
+end
+
+button:addEventListener("tap", onButtonTap)
+```
+
+Nell'esempio sopra, stiamo gestendo l'evento "tap" sul pulsante. Quando l'utente tocca o clicca il pulsante, la funzione di callback `onButtonTap` viene chiamata. All'interno di questa funzione, puoi eseguire le azioni desiderate quando il pulsante viene premuto. Nel nostro caso, stiamo semplicemente stampando un messaggio nella console.
+
+3. Esecuzione del progetto
+Puoi eseguire il progetto e interagire con il pulsante. Osserva come la funzione di callback viene chiamata quando il pulsante viene toccato o cliccato e come le azioni all'interno di essa vengono eseguite.
+
+Puoi personalizzare ulteriormente il pulsante virtuale utilizzando immagini personalizzate per rappresentare i pulsanti, modificando gli stili visivi in base allo stato (ad esempio, un effetto di illuminazione quando il pulsante viene premuto) e gestendo gli eventi di input come "touch" anziché "tap" se desideri avere più controllo sulle fasi del tocco.
+
+Ricorda di consultare la documentazione ufficiale di Solar2D per ulteriori dettagli sull'utilizzo dei pulsanti virtuali e per scoprire altre opzioni disponibili per personalizzare il loro comportamento e aspetto.
+
+#### Pad virtuale
+
+```lua
+local centerX = display.contentCenterX
+local centerY = display.contentCenterY
+
+local pad = display.newCircle(centerX, centerY, 100)
+pad:setFillColor(0.5, 0.5, 0.5)
+
+local function movePlayer(event)
+    local angle = math.atan2(event.y - centerY, event.x - centerX)
+    local distance = math.sqrt((event.x - centerX)^2 + (event.y - centerY)^2)
+    
+    if distance > 50 then
+        distance = 50
+    end
+    
+    local newX = centerX + math.cos(angle) * distance
+    local newY = centerY + math.sin(angle) * distance
+    
+    player.x = newX
+    player.y = newY
+    
+    if event.phase == "ended" then
+        player.x = centerX
+        player.y = centerY
+    end
+end
+
+pad:addEventListener("touch", movePlayer)
+```
+
+In questo esempio, stiamo creando un pad virtuale rappresentato da un cerchio grigio di dimensioni 100x100 al centro dello schermo. La funzione `movePlayer` gestisce l'evento touch sul pad e muove il giocatore (rappresentato dall'oggetto `player`) in base alla direzione del tocco.
+
+All'interno della funzione `movePlayer`, calcoliamo l'angolo tra il centro del pad e la posizione del tocco utilizzando la funzione `math.atan2()`. Calcoliamo anche la distanza tra il centro del pad e la posizione del tocco utilizzando la funzione `math.sqrt()`.
+
+Successivamente, limitiamo la distanza massima del movimento del giocatore a 50 pixel (o il valore desiderato). Calcoliamo le nuove coordinate del giocatore in base all'angolo e alla distanza e aggiorniamo le proprietà `x` e `y` dell'oggetto `player`.
+
+Infine, se l'evento touch si conclude (fase "ended"), reimpostiamo la posizione del giocatore al centro del pad.
+
+Puoi personalizzare ulteriormente questo esempio aggiungendo logica per la gestione del movimento del giocatore, come l'aggiornamento delle velocità e la collisione con gli oggetti del gioco.
+
+#### Un primo esempio di gioco
+
+Con i concetti fino ad ora acquisiti è già possibile scrivere un piccolo gioco, nello specifico scriveremo un gioco dove il giocatore controlla una forma che si muove dal basso all'alto e viceversa e deve evitare lo scontro con forme che entrano lateralmente.
+
+**Il file main.lua**
+
+```lua
+-- inclusione modulo delta time
+local dt = require( 'deltatime' )
+-- inclusione modulo per l'utilizzo del pulsante nativo
+local widget = require("widget")
+
+-- variabili globali
+-- ultima volta che è stato creato un nemico
+local last_time = nil
+-- teniamo traccia dell'ultimo lato dello schermo raggiunto
+local last_border = nil
+-- variabile per il punteggio
+local score
+-- il nostro oggetto player
+local player
+-- l'oggetto grafico che stampa sullo schermo il punteggio
+local score_text
+-- array di nemici
+local enemies = {}
+
+-- dimensione dello schermo
+local gameWidth = display.contentWidth
+local gameHeight = display.contentHeight
+-- px per secondo
+local playerSpeed = 300
+local enemySpeed = 300
+-- ogni quanti secondi sarà creato un nemico
+local theshold = 1
+-- stato del gioco play o dead
+local current_state = 'play'
+
+-- questa funzione crea il giocatore al centro dello schermo
+local function createPlayer()
+    player = display.newRect(0, 0, 50, 50)
+    player.x = display.contentCenterX
+    player.y = display.contentCenterY
+    player:setFillColor(0, 1, 0)
+end
+
+-- qui creaimo ogni tot di tempo un nemico
+-- con una funzione random deciaimo se percorre destra sinistra
+-- oppure sinistra desta
+-- lo inseriamo negli array dei nemici
+local function createEnemy(delta)
+    if last_time == nil then
+        last_time = delta
+    else
+        last_time = last_time + delta
+    end
+    local randomValue = math.random(1, 2)
+
+    if(last_time > theshold) then
+        local enemy = display.newRect(0, 0, 30, 30)
+        if randomValue == 1 then
+            enemy.x = gameWidth + enemy.width
+            enemy.dir = '_from_right'
+        else
+            enemy.x = 0 - enemy.width
+            enemy.dir = '_from_left'
+        end
+        enemy.y = math.random(gameHeight)
+        enemy:setFillColor(1, 0, 0)
+        table.insert(enemies, enemy)
+        last_time = 0
+    end
+end
+
+-- sull'evento touch invertiamo la direzione del movimento del giocatore
+local function evtPlayer(event)
+    if event.phase == "began" then
+        playerSpeed = -playerSpeed
+    end
+end
+
+-- muoviamo il giocatore
+local function movePlayer(delta)
+    player.y = player.y + (playerSpeed * delta)
+end
+
+-- muoviamo i nemici
+local function moveEnemies(delta)
+    for i = #enemies, 1, -1 do
+        local enemy = enemies[i]
+        if enemy.dir == '_from_right' then
+            enemy.x = enemy.x - enemySpeed * delta
+        end
+
+        if enemy.dir == '_from_left' then
+            enemy.x = enemy.x + enemySpeed * delta
+        end
+
+        if enemy.x < -enemy.width then
+            display.remove(enemy)
+            table.remove(enemies, i)
+        end
+    end
+end
+
+-- facciamo un controllo di collisione su ogni nemico
+-- l'algoritmo è stato spiegato nel capitolo precendte
+local function checkCollision()
+    for i = #enemies, 1, -1 do
+        local enemy = enemies[i]
+        if player.x < enemy.x + enemy.width and
+           player.x + player.width > enemy.x and
+           player.y < enemy.y + enemy.height and
+           player.y + player.height > enemy.y then
+            current_state = 'dead'
+        end
+    end
+end
+
+-- per la collisione con i bordi in realtà ci basta controllare la componente Y del giocatore 
+local function checkBorderCollision()
+    if player.y < 10 or player.y > (gameHeight -10) then
+        playerSpeed = -playerSpeed
+
+        if last_border == nil then
+            score = score + 1
+        else
+            if last_border == 'down' and player.y < 10 then score = score + 1 end
+            if last_border == 'top' and player.y > (gameHeight -10) then score = score + 1 end
+        end
+        if player.y < 10 then last_border = 'top' end
+        if player.y > (gameHeight -10) then last_border = 'down' end
+    end
+end
+
+-- aggiorniamo il punteggio
+local function updateScore()
+    score_text.text = tostring(score)
+end
+
+-- il nostro gameloop, viene eseguito circa 30 volte al secondo e chiama i vari metodi
+local function gameLoop()
+    local delta = dt.getTime()
+    if current_state == 'play' then
+        createEnemy(delta)
+        moveEnemies(delta)
+        movePlayer(delta)
+        checkBorderCollision()
+        checkCollision()
+        updateScore()
+    elseif current_state == 'dead' then
+        game_over()
+    end
+
+end
+
+-- la funzione game over, rimuoviamo i listener e gli oggetti
+function game_over()
+    Runtime:removeEventListener("touch", evtPlayer)
+    Runtime:removeEventListener( 'enterFrame', gameLoop )
+
+    -- Rimuovi gli oggetti di gioco
+    display.remove(score_text)
+    display.remove(player)
+    player = nil
+
+    for i = #enemies, 1, -1 do
+        display.remove(enemies[i])
+        table.remove(enemies, i)
+    end
+
+    create_menu()
+end
+
+-- la funzione start creiamo i listener e gli oggetti
+function start_game()
+
+    score_text = display.newText({
+        text = tostring(score),
+        x = 10,
+        y = 10,
+        width = 200,
+        height = 30,
+        font = native.systemFont,
+        fontSize = 20,
+        align = "center"
+    })
+
+    score = 0
+    createPlayer()
+    current_state = 'play'
+    dt.restart()
+    Runtime:addEventListener("touch", evtPlayer)
+    Runtime:addEventListener( 'enterFrame', gameLoop )
+end
+
+-- il menù sarà molto semplice, un bottone per avviare il gioco
+function create_menu()
+
+    local function buttonClicked(event)
+        if event.phase == "ended" then
+            event.target:removeSelf()
+            start_game()
+        end
+    end
+
+    -- Crea il bottone
+    local button = widget.newButton({
+        left = (gameWidth - 200) / 2,
+        top = 200,
+        width = 200,
+        height = 50,
+        label = "Start Game",
+        onRelease = buttonClicked
+    })
+
+end
+
+create_menu()
+```
+
+**e il modulo delta time**
+
+```lua
+local getTimer = system.getTimer
+local lastTime = 0
+
+local M = {}
+
+function M.getTime()
+   local dt = 0
+   if lastTime == 0 then
+      lastTime = getTimer()
+   else
+      local curTime = getTimer()
+      dt = curTime - lastTime
+      lastTime = curTime
+   end
+   -- convertiamo nuovemnte in secondi
+   return dt / 1000
+end
+
+function M.restart()
+   lastTime = 0
+end
+
+return M
+```
+
+Questo tipo di enimazione a differenza di un motore fisico dove si applicano le forze e fatta in maniera **manuale** ogni tot volte al secondo viene eseguito il gameloop e il *deltatime* ossia i millisecondi passati tra una chiamata e l'altra permettono di modificare di conseguenza il movimento.
+
+Questo sistema serve per ottenere animazioni fluide, incrementare un valore costante ad ogni iterazione potrebbe non essere ottimale in quanto la funzione potrebbe non venire richiamata ad intervalli di tempo regolari.
+
+### Grafica e animazione
+
+#### Immagine e sprite
+
+In Solar2D, puoi utilizzare immagini e sprite sheet per visualizzare grafica statica o animata nei tuoi progetti. Ecco come puoi utilizzarli:
+
+**1. Utilizzo di immagini statiche:**
+Per utilizzare un'immagine statica, puoi utilizzare la funzione `display.newImage()` o `display.newImageRect()` per creare un oggetto di visualizzazione basato sull'immagine desiderata.
+
+Ecco un esempio di come utilizzare un'immagine statica:
+
+```lua
+local image = display.newImage("path/to/image.png")
+image.x = display.contentCenterX
+image.y = display.contentCenterY
+```
+
+In questo esempio, stiamo creando un oggetto di visualizzazione basato sull'immagine "image.png" e posizionandolo al centro dello schermo.
+
+**2. Utilizzo di sprite sheet:**
+Una sprite sheet è un'immagine che contiene più frame di animazione in una singola immagine. Puoi utilizzare una sprite sheet per creare animazioni fluenti.
+
+Per utilizzare una sprite sheet in Solar2D, devi prima creare un file di definizione della sprite sheet, che specifica le dimensioni dei frame e le posizioni all'interno dell'immagine. Successivamente, puoi utilizzare la funzione `graphics.newImageSheet()` per creare un oggetto di foglio di immagini basato sulla sprite sheet.
+
+Ecco un esempio di come utilizzare una sprite sheet:
+
+```lua
+local options = {
+    frames = {
+        { x = 0, y = 0, width = 100, height = 100 },
+        { x = 100, y = 0, width = 100, height = 100 },
+        -- Altri frame...
+    }
+}
+
+local sheet = graphics.newImageSheet("path/to/sprite_sheet.png", options)
+
+local sequenceData = {
+    {
+        name = "animation",
+        frames = { 1, 2 }, -- Indici dei frame da utilizzare per l'animazione
+        time = 500, -- Tempo di durata di ciascun frame in millisecondi
+        loopCount = 0, -- Numero di volte che l'animazione viene ripetuta (0 per ripetizione infinita)
+    }
+}
+
+local sprite = display.newSprite(sheet, sequenceData)
+sprite.x = display.contentCenterX
+sprite.y = display.contentCenterY
+sprite:setSequence("animation")
+sprite:play()
+```
+
+In questo esempio, stiamo creando un oggetto di foglio di immagini basato sulla sprite sheet "sprite_sheet.png" utilizzando la definizione dei frame specificati nell'opzione `frames`. Successivamente, definiamo i dati della sequenza per l'animazione, che specificano quali frame utilizzare, il tempo di durata di ciascun frame e il numero di volte che l'animazione viene ripetuta. Infine, creiamo un oggetto di sprite basato sul foglio di immagini e avviamo l'animazione utilizzando i metodi `setSequence()` e `play()`.
+
+Puoi personalizzare ulteriormente l'utilizzo di sprite sheet aggiungendo più sequenze di animazione, definendo eventi da scatenare durante l'animazione o utilizzando metodi come `pause()` e `stop()` per controllare l'animazione.
+
+#### Animazioni
+
+Per creare animazioni con Solar2D, puoi utilizzare sprite sheet e sequenze di animazione. Ecco una guida passo-passo su come creare animazioni in Solar2D:
+
+**1. Preparazione della sprite sheet:**
+Prima di tutto, assicurati di avere una sprite sheet che contiene i frame dell'animazione desiderata. Una sprite sheet è un'immagine che contiene tutti i frame dell'animazione disposti in una griglia.
+
+**2. Creazione del foglio di immagini:**
+Utilizza la funzione `graphics.newImageSheet()` per creare un oggetto di foglio di immagini basato sulla sprite sheet. Passa il percorso dell'immagine e una tabella di opzioni che definiscono i dettagli dei frame.
+
+```lua
+local options = {
+    frames = {
+        { x = 0, y = 0, width = 100, height = 100 },
+        { x = 100, y = 0, width = 100, height = 100 },
+        -- Aggiungi gli altri frame dell'animazione
+    }
+}
+
+local sheet = graphics.newImageSheet("path/to/sprite_sheet.png", options)
+```
+
+Nell'esempio sopra, stiamo creando un oggetto di foglio di immagini basato sulla sprite sheet "sprite_sheet.png". La tabella `options` specifica i dettagli dei frame, come le coordinate (x, y) di ciascun frame e le dimensioni (width, height) di ciascun frame.
+
+**3. Definizione delle sequenze di animazione:**
+Successivamente, definisci le sequenze di animazione utilizzando la funzione `graphics.newAnimationSequence()` e la funzione `addSequence()` sull'oggetto di foglio di immagini.
+
+```lua
+local sequenceData = {
+    {
+        name = "animation",
+        frames = { 1, 2 }, -- Indici dei frame da utilizzare per l'animazione
+        time = 500, -- Tempo di durata di ciascun frame in millisecondi
+        loopCount = 0 -- Numero di volte che l'animazione viene ripetuta (0 per ripetizione infinita)
+    }
+}
+
+local sprite = display.newSprite(sheet, sequenceData)
+```
+
+Nell'esempio sopra, stiamo definendo una sequenza di animazione chiamata "animation". La sequenza utilizza i frame con gli indici 1 e 2 dal foglio di immagini. Ogni frame verrà visualizzato per 500 millisecondi. Il valore `loopCount` imposta il numero di volte che l'animazione viene ripetuta. Se impostato su 0, l'animazione verrà ripetuta all'infinito.
+
+**4. Riproduzione dell'animazione:**
+Infine, puoi avviare l'animazione utilizzando i metodi `setSequence()` e `play()` sull'oggetto di sprite.
+
+```lua
+sprite:setSequence("animation")
+sprite:play()
+```
+
+Nell'esempio sopra, stiamo impostando la sequenza di animazione "animation" sull'oggetto di sprite e avviando l'animazione.
+
+Puoi personalizzare ulteriormente l'animazione aggiungendo più sequenze di animazione, definendo eventi da scatenare durante l'animazione o utilizzando metodi come `pause()` e `stop()` per controllare l'animazione.
+
+##### Effetti grafici e filtri
+
+Solar2D offre diverse opzioni per applicare effetti grafici e filtri ai tuoi oggetti di visualizzazione. Ecco alcuni esempi di come puoi utilizzare effetti grafici e filtri in Solar2D:
+
+**1. Applicazione di effetti di transizione:**
+Puoi utilizzare la funzione `transition.to()` per creare effetti di transizione fluidi su oggetti di visualizzazione. Ad esempio, puoi spostare un oggetto gradualmente da una posizione all'altra, modificarne la scala, la rotazione o l'opacità nel tempo.
+
+```lua
+local myObject = display.newRect(100, 100, 200, 200)
+
+transition.to(myObject, { x = 300, y = 300, time = 1000, transition = easing.outQuad })
+```
+
+Nell'esempio sopra, stiamo creando un rettangolo e utilizzando la funzione `transition.to()` per spostarlo dalla posizione (100, 100) alla posizione (300, 300) in 1 secondo. Il parametro `transition` specifica l'effetto di transizione da utilizzare (in questo caso, "outQuad" per una transizione graduale).
+
+**2. Applicazione di filtri grafici:**
+Solar2D supporta l'applicazione di filtri grafici agli oggetti di visualizzazione. Puoi utilizzare filtri predefiniti come `graphics.newOutline()` per aggiungere un contorno all'oggetto o `graphics.newMask()` per applicare una maschera. Puoi anche creare filtri personalizzati utilizzando le funzioni di shader.
+
+Ecco un esempio di come applicare un filtro di contorno a un oggetto:
+
+```lua
+local myObject = display.newRect(100, 100, 200, 200)
+myObject:setFillColor(1, 0, 0)
+
+local outlineFilter = graphics.newOutline(2)
+myObject.fill.effect = "filter.outline"
+myObject.fill.effect.outline.effectColor = { 0, 0, 0, 1 }
+myObject.fill.effect.outline.effectWidth = 4
+```
+
+Nell'esempio sopra, stiamo creando un rettangolo rosso e applicando un filtro di contorno. Creiamo un filtro di contorno utilizzando la funzione `graphics.newOutline()` e lo assegnamo all'oggetto di visualizzazione tramite la proprietà `fill.effect`. Possiamo personalizzare il colore e la larghezza del contorno attraverso le proprietà dell'effetto.
+
+**3. Utilizzo di shader personalizzati:**
+Solar2D supporta anche l'utilizzo di shader personalizzati per creare effetti grafici avanzati. Puoi creare shader personalizzati utilizzando il linguaggio di shading GLSL (OpenGL Shading Language).
+
+Ecco un esempio di come utilizzare uno shader personalizzato per applicare un effetto di dissolvenza su un oggetto:
+
+```lua
+local myObject = display.newRect(100, 100, 200, 200)
+
+local dissolveShader = graphics.newShader({
+    language = "glsl",
+    fragment = [[
+        uniform float progress;
+
+        vec4 effect(vec4 color, sampler2D texture, vec2 texture_coords, vec2 screen_coords)
+        {
+            vec4 texcolor = texture2D(texture, texture_coords);
+            texcolor.a *= progress;
+            return texcolor * color;
+        }
+    ]]
+})
+
+myObject.fill.effect = "filter.custom"
+
+
+myObject.fill.effect.progress = 0.5
+myObject.fill.effect.fill.effect.progressUniform = "progress"
+```
+
+Nell'esempio sopra, stiamo creando un rettangolo e applicando uno shader personalizzato. Creiamo lo shader utilizzando la funzione `graphics.newShader()` e definiamo il codice GLSL per l'effetto di dissolvenza. Assegniamo lo shader all'oggetto di visualizzazione tramite la proprietà `fill.effect` e possiamo personalizzare i parametri dello shader come `progress` per controllare l'intensità dell'effetto.
+
+#### Effetti grafici in pratica
+
+Certamente! Di seguito troverai un tutorial su come applicare effetti grafici di base utilizzando Solar2D:
+
+Passo 1: Preparazione dell'oggetto di visualizzazione
+Inizia creando un oggetto di visualizzazione a cui desideri applicare l'effetto. Puoi utilizzare le funzioni `display.newRect()`, `display.newImage()`, ecc., a seconda del tipo di oggetto che desideri utilizzare. Ad esempio, creiamo un rettangolo rosso:
+
+```lua
+local myObject = display.newRect(display.contentCenterX, display.contentCenterY, 200, 200)
+myObject:setFillColor(1, 0, 0)
+```
+
+Passo 2: Creazione e applicazione dell'effetto
+Solar2D supporta diversi effetti predefiniti che puoi applicare ai tuoi oggetti di visualizzazione. Di seguito sono riportati alcuni esempi di effetti grafici di base:
+
+- Effetto di ombra: Puoi applicare un effetto di ombra utilizzando la funzione `display.setDefault()` e impostando le proprietà `effect.shadow` del tuo oggetto di visualizzazione. Ad esempio, crea un'ombra nera sotto l'oggetto:
+
+```lua
+display.setDefault("isShadowEnabled", true)
+myObject.effect = "shadow"
+myObject.effect.shadow = { offsetX = 5, offsetY = 5, alpha = 0.8 }
+```
+
+- Effetto di sfocatura: Puoi applicare un effetto di sfocatura utilizzando la funzione `display.setDefault()` e impostando le proprietà `effect.blur` del tuo oggetto di visualizzazione. Ad esempio, crea un effetto di sfocatura con un raggio di 10 pixel:
+
+```lua
+display.setDefault("isBlurEnabled", true)
+myObject.effect = "filter.blur"
+myObject.effect.blur = { blurHorizontalAmount = 10, blurVerticalAmount = 10 }
+```
+
+- Effetto di colore: Puoi applicare un effetto di colore utilizzando la funzione `display.setDefault()` e impostando le proprietà `effect.colorMatrix` del tuo oggetto di visualizzazione. Ad esempio, crea un effetto di colore che cambia il rettangolo in una tonalità blu:
+
+```lua
+display.setDefault("isColorMatrixEnabled", true)
+myObject.effect = "filter.colorMatrix"
+myObject.effect.colorMatrix = { 
+    matrix = { 0, 0, 0, 0, 0,
+               0, 0, 0, 0, 0,
+               1, 1, 1, 0, 0,
+               0, 0, 0, 1, 0 }
+}
+```
+
+Passo 3: Rimozione dell'effetto
+Se desideri rimuovere l'effetto applicato, puoi semplicemente impostare la proprietà `effect` dell'oggetto di visualizzazione su `nil`. Ad esempio:
+
+```lua
+myObject.effect = nil
+```
+
+Questo rimuoverà l'effetto e riporterà l'oggetto alla sua visualizzazione originale.
+
